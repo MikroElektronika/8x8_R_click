@@ -2,7 +2,7 @@
 
 ---
 
-# C8x8R Click
+# 8x8 R Click
 
 - **CIC Prefix**  : C8X8R
 - **Author**      : Katarina Perendic
