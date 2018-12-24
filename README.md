@@ -2,45 +2,62 @@
 
 ---
 
-# 8x8 R Click
+# 8x8_R Click
+
+---
 
 - **CIC Prefix**  : C8X8R
 - **Author**      : Katarina Perendic
 - **Verison**     : 1.0.0
-- **Date**        : Dec 2017.
+- **Date**        : Jan 2018.
+
+---
+
+- **Libstock** : https://libstock.mikroe.com/projects/view/2323/8x8-r-click
+- **HEXIWEAR** : ${HEXI_LINK}
+- **GitHub**   : ${GITHUB_LINK}
 
 ---
 
 ### Software Support
 
-We provide a library for the 8x8 Click on our [LibStock](https://libstock.mikroe.com/projects/view/2323/8x8-r-click) 
+We provide a library for the 8x8_R Click on our [LibStock](https://libstock.mikroe.com/projects/view/2323/8x8-r-click) 
 page, as well as a demo application (example), developed using MikroElektronika 
 [compilers](http://shop.mikroe.com/compilers). The demo can run on all the main 
 MikroElektronika [development boards](http://shop.mikroe.com/development-boards).
 
 **Library Description**
 
-Library provides generic functions for controlling the click board.
+The library contains all the necessary functions for text and images on led matrix 8x8.
+The library provides full control of 8x8 R click.
 
 Key functions :
 
-- ```void c8x8r_writeReg(uint8_t Reg, uint8_t Value);``` - Function for writing data to a register.
-- ```void c8x8r_writeText(uint8_t *pStr, uint8_t nLenght);``` - Scrols provided text
+- ``` void c8x8r_displayImage(uint8_t *pArray) ``` - Image display function
+- ``` void c8x8r_displayString(char *pArray) ``` - Scroll string function
+- ``` void c8x8r_displayByte(char ch) ``` - Function for displaying one character
 
 **Examples Description**
 
 The application is composed of three sections :
 
 - System Initialization - Intializes CS pin as output and SPI module
-- Application Initialization - Driver intialization and default configration of the 8x8 click board.
-- Application Task - (code snippet) - Sequential writing of provided string each one second.
+- Application Initialization - Driver intialization and default configration
+of the 8x8 click board and settings speed scroll as Midium speed and refresh display.
+- Application Task - (code snippet) - Shows one byte, then scrolls the string and image, every 1 sec.
 
 
 ```.c
 void applicationTask()
 {
-    c8x8r_displayWord(&demoString[0]);
-    Delay_1sec();
+    c8x8r_displayByte(demoChar);
+    Delay_ms( 1000 );
+    c8x8r_displayString(&demoString[0]);
+    Delay_ms( 1000 );
+    c8x8r_displayImage(&demoImgOn[0]);
+    Delay_ms( 500 );
+    c8x8r_displayImage(&demoImgOff[0]);
+    Delay_ms( 1000 );
 }
 ```
 
@@ -49,8 +66,6 @@ The full application code, and ready to use projects can be found on our
 
 Other mikroE Libraries used in the example:
 
-- Conversions
-- C_String
 - SPI
 
 **Additional notes and informations**

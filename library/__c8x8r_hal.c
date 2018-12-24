@@ -17,7 +17,7 @@
 */
 /**
 @defgroup   C8X8R_HAL
-@brief      C8x8R HAL Interface
+@brief      8x8_R HAL Interface
 @{
 
 | Global Library Prefix | **HAL**            |
@@ -325,7 +325,7 @@ static void hal_gpioMap(T_HAL_P gpioObj)
 #ifdef __AN_PIN_INPUT__
     hal_gpio_anGet = tmp->gpioGet[ __AN_PIN_INPUT__ ];
 #endif
-#ifdef __CS_PIN_INPUT
+#ifdef __CS_PIN_INPUT__
     hal_gpio_csGet = tmp->gpioGet[ __CS_PIN_INPUT__ ];
 #endif
 #ifdef __RST_PIN_INPUT__

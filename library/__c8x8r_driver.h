@@ -13,22 +13,22 @@
 
 /**
 @file   __c8x8r_driver.h
-@brief    C8x8R Driver
-@mainpage C8x8R Click
+@brief    8x8_R Driver
+@mainpage 8x8_R Click
 @{
 
-@image html sch.jpg
+@image html libstock_fb_view.jpg
 
 @}
 
 @defgroup   C8X8R
-@brief      C8x8R Click Driver
+@brief      8x8_R Click Driver
 @{
 
 | Global Library Prefix | **C8X8R** |
 |:---------------------:|:-----------------:|
 | Version               | **1.0.0**    |
-| Date                  | **Dec 2017.**      |
+| Date                  | **Jan 2018.**      |
 | Developer             | **MikroE Team**     |
 
 */
@@ -54,22 +54,22 @@
                                                                        /** @} */
 /** @defgroup C8X8R_VAR Variables */                           /** @{ */
 
-                                                                       /** @} */
-/** @defgroup ADDRESS REG Register format */                           /** @{ */		  
+
+extern const uint8_t _C8X8R_SPEED_FAST;
+extern const uint8_t _C8X8R_SPEED_MEDIUM;
+extern const uint8_t _C8X8R_SPEED_SLOW;
+
 extern const uint8_t _C8X8R_DECODE_MODE_REG;
 extern const uint8_t _C8X8R_INTENSITY_REG;
 extern const uint8_t _C8X8R_SCAN_LIMIT_REG;
 extern const uint8_t _C8X8R_SHUTDOWN_REG;
 extern const uint8_t _C8X8R_DISPLAY_TEST_REG;
-                                                                       /** @} */
-/** @defgroup DECODE MODE Register format */                           /** @{ */ 
+                                                                       
 extern const uint8_t _C8X8R_NO_DECODE;
 extern const uint8_t _C8X8R_DECODE_DIGIT_0;                                        
 extern const uint8_t _C8X8R_DECODE_DIGIT_3_0;
 extern const uint8_t _C8X8R_DECODE_DIGIT_7;
 
-                                                                     /** @} */
-/** @defgroup INTENSITY Register format */                           /** @{ */
 extern const uint8_t _C8X8R_INTENSITY_1;
 extern const uint8_t _C8X8R_INTENSITY_3;
 extern const uint8_t _C8X8R_INTENSITY_5;
@@ -87,8 +87,6 @@ extern const uint8_t _C8X8R_INTENSITY_27;
 extern const uint8_t _C8X8R_INTENSITY_29;
 extern const uint8_t _C8X8R_INTENSITY_31;
 
-                                                                   /** @} */
-/** @defgroup DISPLAY Register format */                           /** @{ */
 extern const uint8_t _C8X8R_DISPLAY_DIGIT_0;
 extern const uint8_t _C8X8R_DISPLAY_DIGIT_0_1;
 extern const uint8_t _C8X8R_DISPLAY_DIGIT_0_2;
@@ -98,23 +96,14 @@ extern const uint8_t _C8X8R_DISPLAY_DIGIT_0_5;
 extern const uint8_t _C8X8R_DISPLAY_DIGIT_0_6;
 extern const uint8_t _C8X8R_DISPLAY_DIGIT_0_7;
 
-                                                                   /** @} */
-/** @defgroup MODE Register format */                              /** @{ */
 extern const uint8_t _C8X8R_SHUTDOWN_MODE;
 extern const uint8_t _C8X8R_NORMAL_OPERATION;
-
-                                                                    /** @} */
-/** @defgroup DISPLAY TEST Register format */                       /** @{ */
 
 extern const uint8_t _C8X8R_DISPLAY_NORMAL_OPERATION;
 extern const uint8_t _C8X8R_DISPLAY_TEST_MODE;
 
-                                                                    /** @} */
-/** @defgroup C8X8R_TYPES Types */                                  /** @{ */
-
-
-
                                                                        /** @} */
+
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -131,35 +120,67 @@ void c8x8r_i2cDriverInit(T_C8X8R_P gpioObj, T_C8X8R_P i2cObj, uint8_t slave);
 void c8x8r_uartDriverInit(T_C8X8R_P gpioObj, T_C8X8R_P uartObj);
 #endif
 
-
+// GPIO Only Drivers - remove in other cases
 void c8x8r_gpioDriverInit(T_C8X8R_P gpioObj);
                                                                        /** @} */
 /** @defgroup C8X8R_FUNC Driver Functions */                   /** @{ */
 
 /**
- * @brief This function write data in register
+ * @brief Function for sending the command
  *
- * @param[in] Reg             register
- * @param[in] Value           data
- *
- */
-void c8x8r_writeReg(uint8_t Reg, uint8_t Value);
-/**
- * @brief  Display character on matrix
- *
- * @param[in] pStr          Pointer to array for display
- * @param[in] nLenght       Length array for display
+ * @param[in] command         the command to be executed
+ * @param[in] _data           data to be sent
  *
  */
-void c8x8r_writeText(uint8_t *pStr,uint8_t nLenght);
-/**
- * @brief 
- * 
- * @param[in] pArray        Start array with ascii character
- *
- */
-void c8x8r_displayWord(char *pArray);
+void c8x8r_writeCmd(uint8_t command, uint8_t _data);
 
+/**
+ * @brief Function for refresh display
+ *
+ * The function switches off all LEDs
+ */
+void c8x8r_displayRefresh();
+
+/**
+ * @brief Function for settings speed scroll display string
+ *
+ * @param[in] speed        Speed that will be set
+ *
+ * Options:
+      Fast speed (30ms per character),
+      Medium speed (100ms per character) - default speed,
+      Slow speed ( 200ms per character),
+ */
+void c8x8r_setSpeedScroll(uint8_t speed);
+
+/**
+ * @brief Function for displaying one character
+ * 
+ * @param[in] ch        Character to be displayed
+ *
+ */
+void c8x8r_displayByte(char ch);
+
+/**
+ * @brief Scroll string function
+ *
+ * @param[in] pArray       Pointer to the string to be displayed
+ *
+ * Function that displays scrolled string with set speed.
+   If the speed is not set before calling the function,
+   default scroll speed is 100ms per character.
+ */
+void c8x8r_displayString(char *pArray);
+
+/**
+ * @brief Image display function
+ *
+ * @param[in] pArray       Pointer to the image to be displayed
+ *
+ * Function for displays the image.
+   The image consists of eight elements (eight columns that build the image).
+ */
+void c8x8r_displayImage(uint8_t *pArray);
 
 
 
@@ -172,36 +193,36 @@ void c8x8r_displayWord(char *pArray);
 #endif
 
 /**
-    @example Click_C8x8R_STM.c
-    @example Click_C8x8R_TIVA.c
-    @example Click_C8x8R_CEC.c
-    @example Click_C8x8R_KINETIS.c
-    @example Click_C8x8R_MSP.c
-    @example Click_C8x8R_PIC.c
-    @example Click_C8x8R_PIC32.c
-    @example Click_C8x8R_DSPIC.c
-    @example Click_C8x8R_AVR.c
-    @example Click_C8x8R_FT90x.c
-    @example Click_C8x8R_STM.mbas
-    @example Click_C8x8R_TIVA.mbas
-    @example Click_C8x8R_CEC.mbas
-    @example Click_C8x8R_KINETIS.mbas
-    @example Click_C8x8R_MSP.mbas
-    @example Click_C8x8R_PIC.mbas
-    @example Click_C8x8R_PIC32.mbas
-    @example Click_C8x8R_DSPIC.mbas
-    @example Click_C8x8R_AVR.mbas
-    @example Click_C8x8R_FT90x.mbas
-    @example Click_C8x8R_STM.mpas
-    @example Click_C8x8R_TIVA.mpas
-    @example Click_C8x8R_CEC.mpas
-    @example Click_C8x8R_KINETIS.mpas
-    @example Click_C8x8R_MSP.mpas
-    @example Click_C8x8R_PIC.mpas
-    @example Click_C8x8R_PIC32.mpas
-    @example Click_C8x8R_DSPIC.mpas
-    @example Click_C8x8R_AVR.mpas
-    @example Click_C8x8R_FT90x.mpas
+    @example Click_8x8_R_STM.c
+    @example Click_8x8_R_TIVA.c
+    @example Click_8x8_R_CEC.c
+    @example Click_8x8_R_KINETIS.c
+    @example Click_8x8_R_MSP.c
+    @example Click_8x8_R_PIC.c
+    @example Click_8x8_R_PIC32.c
+    @example Click_8x8_R_DSPIC.c
+    @example Click_8x8_R_AVR.c
+    @example Click_8x8_R_FT90x.c
+    @example Click_8x8_R_STM.mbas
+    @example Click_8x8_R_TIVA.mbas
+    @example Click_8x8_R_CEC.mbas
+    @example Click_8x8_R_KINETIS.mbas
+    @example Click_8x8_R_MSP.mbas
+    @example Click_8x8_R_PIC.mbas
+    @example Click_8x8_R_PIC32.mbas
+    @example Click_8x8_R_DSPIC.mbas
+    @example Click_8x8_R_AVR.mbas
+    @example Click_8x8_R_FT90x.mbas
+    @example Click_8x8_R_STM.mpas
+    @example Click_8x8_R_TIVA.mpas
+    @example Click_8x8_R_CEC.mpas
+    @example Click_8x8_R_KINETIS.mpas
+    @example Click_8x8_R_MSP.mpas
+    @example Click_8x8_R_PIC.mpas
+    @example Click_8x8_R_PIC32.mpas
+    @example Click_8x8_R_DSPIC.mpas
+    @example Click_8x8_R_AVR.mpas
+    @example Click_8x8_R_FT90x.mpas
 */                                                                     /** @} */
 /* -------------------------------------------------------------------------- */
 /*
@@ -241,4 +262,3 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ----------------------------------------------------------------------------- */
-

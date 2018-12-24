@@ -114,8 +114,12 @@ static const uint8_t ascii_matrix[][10] = {
           { 0x00, 0x00, 0x22, 0x36, 0x1c, 0x8,  0x1c, 0x36, 0x22, 0x0 },   // x -- 120
           { 0x00, 0x00, 0x39, 0x3e, 0x5,  0x5,  0x5,  0x3f, 0x3e, 0x0 },   // y -- 121
           { 0x00, 0x00, 0x0,  0x32, 0x26, 0x2e, 0x3a, 0x32, 0x26, 0x0 } };
-                  
-                  
+
+
+const uint8_t _C8X8R_SPEED_FAST   = 3;
+const uint8_t _C8X8R_SPEED_MEDIUM = 2;
+const uint8_t _C8X8R_SPEED_SLOW   = 1;
+
 // Register Address Map
 const uint8_t _C8X8R_DECODE_MODE_REG           =   0x09;
 const uint8_t _C8X8R_INTENSITY_REG             =   0x0A;
@@ -176,9 +180,13 @@ const uint8_t _C8X8R_DISPLAY_TEST_MODE         =  0X01;
 static uint8_t _slaveAddress;
 #endif
 
+static uint8_t _speedScroll;
+
+
 /* -------------------------------------------- PRIVATE FUNCTION DECLARATIONS */
 
 static uint8_t _strlen(uint8_t *s);
+static void _speed();
 
 /* --------------------------------------------- PRIVATE FUNCTION DEFINITIONS */
 
@@ -189,6 +197,27 @@ static uint8_t _strlen(uint8_t *s)
     return (sc - s);
 }
 
+static void _speed()
+{
+    switch(_speedScroll)
+    {
+        case 1: 
+           Delay_100ms();
+           Delay_100ms();
+           break;
+        case 2:
+           Delay_100ms();
+           break;
+        case 3:
+            Delay_10ms();
+            Delay_10ms();
+            Delay_10ms();
+            break;
+        default:
+            Delay_100ms();
+            break;
+    }
+}
 /* --------------------------------------------------------- PUBLIC FUNCTIONS */
 
 #ifdef   __C8X8R_DRV_SPI__
@@ -198,8 +227,8 @@ void c8x8r_spiDriverInit(T_C8X8R_P gpioObj, T_C8X8R_P spiObj)
     hal_spiMap( (T_HAL_P)spiObj );
     hal_gpioMap( (T_HAL_P)gpioObj );
 
-    // ... power ON
-    // ... configure CHIP
+    hal_gpio_csSet(1);
+    _speedScroll = 0;
 }
 
 #endif
@@ -229,73 +258,96 @@ void c8x8r_uartDriverInit(T_C8X8R_P gpioObj, T_C8X8R_P uartObj)
 
 #endif
 
-// GPIO Only Drivers - remove in other cases
-void c8x8r_gpioDriverInit(T_C8X8R_P gpioObj)
-{
-    hal_gpioMap( (T_HAL_P)gpioObj );
-
-    // ... power ON
-}
 
 /* ----------------------------------------------------------- IMPLEMENTATION */
 
-
-void c8x8r_writeReg(uint8_t Reg, uint8_t Value)
+void c8x8r_writeCmd(uint8_t command, uint8_t _data)
 {
     hal_gpio_csSet( 0 );
-    hal_spiWrite(&Reg,1);
-    hal_spiWrite(&Value,1);
+    hal_spiWrite(&command,1);
+    hal_spiWrite(&_data,1);
     hal_gpio_csSet( 1 );
 }
 
-void c8x8r_writeText(uint8_t *pStr,uint8_t nLenght)
+void c8x8r_displayRefresh()
 {
-    uint8_t Reg;
-    uint8_t i,x;
-    uint8_t SednCmd;
-    uint8_t com = 8;
-    uint8_t position0 = 8;
-    uint8_t position1 = 0;
-
-    while (position0 < nLenght)
-    {
-        i = position0;
-        for (x = i; x < position0 + 8; x++)
-        {
-            Reg = com;
-            SednCmd = pStr[ x ];
-            c8x8r_writeReg(Reg, SednCmd );
-            com = com - 1;
-        }
-        com = 8;
-        position0 = position0 + 1;
-        Delay_100ms();
-    }
+   uint8_t cnt;
+   
+   for( cnt = 1; cnt < 9; cnt++)
+   {
+        c8x8r_writeCmd(cnt,0x00);
+   }
+   Delay_100ms();
 }
 
-void c8x8r_displayWord(char *pArray)
+void c8x8r_setSpeedScroll(uint8_t speed)
+{
+    _speedScroll = speed;
+}
+
+void c8x8r_displayString(char *pArray)
 {
     uint8_t str_word[512];
-    uint8_t length = 0;
-        uint8_t i, k;
-    uint8_t        m = 0;
+    char wrChr;
+    uint8_t cnt, i;
+    uint8_t global_cnt = 0;
     uint8_t charAscii;
+    uint8_t position = 0;
+    uint8_t col = 8;
         
     for (i = 0; i < _strlen(pArray); i++)
     {
         charAscii = pArray[i] - 32;
-        for( k = 0; k < 10; k++)
+        for( cnt = 0; cnt < 10; cnt++)
         {
-            str_word[m++] = ascii_matrix[charAscii][k];
+            str_word[global_cnt++] = ascii_matrix[charAscii][cnt];
         }
     }
+    
+    while ( position < (global_cnt - 8) )
+    {
+         for( cnt = position; cnt < position + 8; cnt++)
+         {
+             wrChr = str_word[cnt];
+             c8x8r_writeCmd(col, wrChr);
+             col--;
+         }
+         col = 8;
+         position++;
+         _speed();
+     }
 
-    length = m - 266;
-    c8x8r_writeText(str_word,length);
 }
 
+void c8x8r_displayByte(char ch)
+{
+    uint8_t cnt;
+    uint8_t charAscii;
+    uint8_t position = 8;
+    char wrChr;
 
+    charAscii = ch - 32;
+    for( cnt = 2; cnt < 10; cnt++)
+    {
+        wrChr = ascii_matrix[charAscii][cnt];
+        c8x8r_writeCmd(position,wrChr);
+        position--;
+    }
+}
 
+void c8x8r_displayImage(uint8_t *pImage)
+{
+    uint8_t cnt;
+    uint8_t line;
+    uint8_t position = 8;
+    
+    for(cnt = 0; cnt < 8; cnt++)
+    {
+        line = pImage[cnt];
+        c8x8r_writeCmd(position,line);
+        position--;
+    }
+}
 
 
 

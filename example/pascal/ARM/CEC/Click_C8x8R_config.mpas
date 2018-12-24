@@ -1,8 +1,0 @@
-unit Click_C8x8R_config;
-
-uses Click_C8x8R_types;
-
-const
-    _C8X8R_SPI_CFG : array[3] of uint32_t = (1000000, _SPI_MSB_FIRST, (_SPI_CLK_IDLE_HIGH or _SPI_SAMPLE_DATA_RISING_EDGE)); 
-    
-end.
