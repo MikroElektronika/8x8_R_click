@@ -1,7 +1,5 @@
 ![MikroE](http://www.mikroe.com/img/designs/beta/logo_small.png)
 
----
-
 # 8x8_R Click
 
 ---
@@ -10,12 +8,6 @@
 - **Author**      : Katarina Perendic
 - **Verison**     : 1.0.0
 - **Date**        : Jan 2018.
-
----
-
-- **Libstock** : https://libstock.mikroe.com/projects/view/2323/8x8-r-click
-- **HEXIWEAR** : ${HEXI_LINK}
-- **GitHub**   : ${GITHUB_LINK}
 
 ---
 
