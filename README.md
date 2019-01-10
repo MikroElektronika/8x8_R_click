@@ -1,8 +1,8 @@
 ![MikroE](http://www.mikroe.com/img/designs/beta/logo_small.png)
 
-# 8x8_R Click
-
 ---
+
+# 8x8_R Click
 
 - **CIC Prefix**  : C8X8R
 - **Author**      : Katarina Perendic
